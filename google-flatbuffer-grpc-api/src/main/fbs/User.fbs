@@ -1,0 +1,79 @@
+include "BaseResponse.fbs";
+namespace com.zpb.fbs.user;
+attribute "first fbs";
+
+/// 职业等级
+enum Level : byte { JUNIOU = 1,MIDDLE,SENIOR}
+
+/// 地址信息
+table Address{
+    /// 国家
+    coutry:string;
+    /// 省份
+    province:string;
+    /// 城市
+    city:string;
+    /// 县区
+    region:string;
+    /// 乡镇、街道
+    street:string;
+    /// 编号
+    no:long;
+}
+
+/// 电话信息
+struct Phone {
+    number:int;
+}
+
+/// 能力
+union Ability { Reading, Swimming, Running }
+
+/// 读书
+table Reading {
+    reading:string;
+}
+
+/// 游泳
+table Swimming {
+    swimming:string;
+}
+
+/// 跑步
+table Running {
+    running:string;
+}
+
+/// 定义对象
+table User {
+    id: long;
+    name: string;
+    age: uint;
+    salary:double;
+    create_time:long;
+    update_time:long;
+    level:Level = MIDDLE;
+    address:Address;
+    phone:Phone;
+    ability:Ability;
+}
+
+root_type User;
+
+/// 用户响应
+table UserResponse {
+    base_response:BaseResponse;
+    status:bool;
+}
+
+/// 定义rpc接口
+rpc_service User {
+    /// 保存
+    save (User):UserResponse;
+
+    /// 更新
+    update(User):UserResponse;
+
+    /// 查询
+    query(User):UserResponse;
+}

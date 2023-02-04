@@ -1,0 +1,13 @@
+namespace com.zpb.fbs.user;
+/// 通用响应类型
+table BaseResponse {
+    /// 响应码
+    code:int;
+
+    /// 数据 data
+    data:string;
+
+    /// 结果描述
+    message:string;
+
+}

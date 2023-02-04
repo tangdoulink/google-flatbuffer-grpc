@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>google-flatbuffer-grpc</artifactId>
+        <groupId>com.zpb.fbs.grpc</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.zpb.fbs.grpc.api</groupId>
+    <artifactId>google-flatbuffer-grpc-api</artifactId>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <fbs.sources>${basedir}/src/main/fbs</fbs.sources>
+        <fbs.generated.sources>${basedir}/src/main/java</fbs.generated.sources>
+    </properties>
+
+    <dependencies>
+
+        <!-- flat buffers-java -->
+        <dependency>
+            <groupId>com.google.flatbuffers</groupId>
+            <artifactId>flatbuffers-java</artifactId>
+        </dependency>
+
+        <!--flat buffers-java-grpc -->
+        <dependency>
+            <groupId>com.google.flatbuffers</groupId>
+            <artifactId>flatbuffers-java-grpc</artifactId>
+        </dependency>
+
+        <!-- maven-dependency-plugin -->
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-stub</artifactId>
+        </dependency>
+
+    </dependencies>
+
+
+    <build>
+        <!-- 1. 下载flat 2.编译 3.添加文件 -->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.github.davidmoten</groupId>
+                                    <artifactId>flatbuffers-compiler</artifactId>
+                                    <version>1.12.0.1</version>
+                                    <classifier>distribution-linux</classifier>
+                                    <type>tar.gz</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- 执行 flatc 命令-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-fbs</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <!-- 编译源码阶段 -->
+                        <phase>generate-sources</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- 执行 flatc 命令-->
+                    <executable>flatc</executable>
+                    <workingDirectory>${fbs.sources}</workingDirectory>
+                    <arguments>
+                        <!-- 生成java代码-->
+                        <argument>--java</argument>
+
+                        <!-- 文件格式-->
+                        <argument>--schema</argument>
+
+                        <!-- 生成 grpc 服务 -->
+                        <argument>--grpc</argument>
+
+                        <!-- 生成缓冲区 -->
+                        <argument>--gen-mutable</argument>
+
+                        <!-- -o: 生成路径 -->
+                        <argument>-o</argument>
+                        <argument>${fbs.generated.sources}</argument>
+
+                        <!-- 文件路径: 文件路径是基于当前工作目录的，上面已经定义了-->
+                        <argument>BaseResponse.fbs</argument>
+                        <argument>User.fbs</argument>
+                        <argument>monster.fbs</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
